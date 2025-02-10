@@ -1,4 +1,4 @@
-import args
+from args import getargs
 import os.path as osp
 from utils import *
 from torch_geometric.data import Data
@@ -49,11 +49,11 @@ def train(models, optimizer, source_data_train, target_data_train):
     encoder = models[0]
     classifier_model = models[1]
 
-    local_source_embedding = encode(source_data_train.x, source_data_train.edge_idnex, imbalance_cache_name, encoder, use_ppmi=False, compensate=True)
-    local_target_embedding = encode(target_data_train.x, target_data_train.edge_idnex, args.target, encoder, use_ppmi=False)
+    local_source_embedding = encode(source_data_train.x, source_data_train.edge_index, imbalance_cache_name, encoder, use_ppmi=False, compensate=True)
+    local_target_embedding = encode(target_data_train.x, target_data_train.edge_index, args.target, encoder, use_ppmi=False)
 
     global_source_embedding = encode(source_data_train.x, source_data_train.edge_index, imbalance_cache_name, encoder, use_ppmi=True, compensate=True)
-    global_target_embedding = encode(target_data_train.x, target_data_train.edge_idnex, args.target, encoder, use_ppmi=True)
+    global_target_embedding = encode(target_data_train.x, target_data_train.edge_index, args.target, encoder, use_ppmi=True)
 
     source_embedding = local_source_embedding + global_source_embedding
     target_embedding = local_target_embedding + global_target_embedding
@@ -80,7 +80,7 @@ def train(models, optimizer, source_data_train, target_data_train):
 
 
 '''----------------------begin_training----------------------------------'''
-args = args.getargs()
+args = getargs()
 print(args)
 
 #prepare data
@@ -128,9 +128,9 @@ imbalance_source_data = Data(
     edge_index = new_edge_index,
 ).to(args.device)
 
-with open('temp/'+imbalance_cache_name+'.pkl', 'rb') as f:
+with open('tmp/'+imbalance_cache_name+'.pkl', 'rb') as f:
     source_edge_index, norm= pickle.load(f)
-with open('temp/'+args.target+'.pkl', 'rb') as f:
+with open('tmp/'+args.target+'.pkl', 'rb') as f:
     target_edge_index, norm = pickle.load(f)
 
 imbalance_source_data.global_adj = source_edge_index.to(args.device)
@@ -155,7 +155,7 @@ def main():
         torch.cuda.manual_seed(time)
 
         # set models
-        encoder = GNNEncoder(imbalance_source_data, args.encoder_dim, args.dropout, source_data.x.shape[1], args.device).to(args.device)
+        encoder = GNNEncoder(imbalance_source_data, args.encoder_dim, args.drop_out, source_data.x.shape[1], args.device).to(args.device)
         classifier_model = nn.Sequential(nn.Linear(args.encoder_dim, n_cls)).to(args.device)
         models = [encoder, classifier_model]
         params = itertools.chain(*[model.parameters() for model in models])
@@ -204,7 +204,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
