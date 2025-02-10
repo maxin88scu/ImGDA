@@ -24,13 +24,13 @@ class GNNEncoder(nn.Module):
         self.dropout_layers = [nn.Dropout(drop_out) for _ in weights]
 
         self.compensation_layers = nn.ModuleList(
-            [add_compensation(source_data[0], encoder_dim, device),
-             add_compensation(source_data[0], encoder_dim, device),]
+            [add_compensation(source_data.size(0), encoder_dim, device),
+             add_compensation(source_data.size(0), encoder_dim, device),]
         )
 
         self.conv_layers = nn.ModuleList([
             PPMIConv(feature_num, encoder_dim, weight=weights[0], bias = biases[0], **kwargs),
-            PPMIConv(feature_num, encoder_dim, weight=weights[1], bias = biases[1], **kwargs),
+            PPMIConv(encoder_dim, encoder_dim, weight=weights[1], bias = biases[1], **kwargs),
         ]).to(device)
 
     def forward(self, x, edge_index, cache_name, compensate, device, use_ppmi = True):
