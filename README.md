@@ -1,6 +1,6 @@
 # 2025 NeurIPS-Dual Prototype-Enhanced Contrastive Framework for Class-Imbalanced Graph Domain Adaptation
 This is the source code for the paper: "Dual Prototype-Enhanced Contrastive Framework for Class-Imbalanced Graph Domain Adaptation"
-  <img width="974" alt="image" src="" />
+  <img width="974" alt="image" src="https://github.com/maxin88scu/ImGDA/images/ImGDA.pdf" />
 
 # Requirements
 The code needs the following packages:
